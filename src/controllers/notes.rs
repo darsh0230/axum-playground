@@ -14,17 +14,6 @@ use crate::{
     AppState,
 };
 
-pub async fn health_check_handler() -> impl IntoResponse {
-    const MESSAGE: &str = "API Services";
-
-    let json_response = serde_json::json!({
-        "status": "ok",
-        "message": MESSAGE
-    });
-
-    Json(json_response)
-}
-
 pub async fn note_list_handler(
     opts: Option<Query<FilterOptions>>,
     State(data): State<Arc<AppState>>,
@@ -36,7 +25,7 @@ pub async fn note_list_handler(
     let offset = (opts.page.unwrap_or(1) - 1) * limit;
 
     // Query without macro
-    let notes =
+    let notes: Vec<NoteModel> =
         sqlx::query_as::<_, NoteModel>(r#"SELECT * FROM notes ORDER by id LIMIT $1 OFFSET $2"#)
             .bind(limit as i32)
             .bind(offset as i32)
@@ -132,15 +121,6 @@ pub async fn get_note_handler(
     Path(id): Path<String>,
     State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    // // get using query macro
-    // let query_result = sqlx::query_as!(
-    //     NoteModel,
-    //     r#"SELECT * FROM notes WHERE id = ?"#,
-    //     &id
-    // )
-    // .fetch_one(&data.db)
-    // .await;
-
     // get not using query macro
     let query_result = sqlx::query_as::<_, NoteModel>(r#"SELECT * FROM notes WHERE id = $1"#)
         .bind(&id)
