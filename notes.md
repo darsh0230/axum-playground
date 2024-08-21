@@ -27,6 +27,8 @@ sqlx migrate revert
 }
 ```
 
-### Tracing
+## References
 
-https://www.shuttle.rs/blog/2024/01/09/getting-started-tracing-rust
+axum + seaorm - https://github.com/trasherr/Blogging-API
+tracing - https://www.shuttle.rs/blog/2024/01/09/getting-started-tracing-rust
+custom error response for missing field in req - https://github.com/tokio-rs/axum/tree/a7d89541786167e990d095a03ac7bdba68d7a55a/examples/customize-extractor-error

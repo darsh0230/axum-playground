@@ -1,11 +1,18 @@
-mod controllers;
-mod model;
+mod handlers;
+mod models;
 mod routes;
 mod schema;
+mod types;
+mod utils;
 
-use std::sync::Arc;
+use thiserror::Error;
 
-use axum::http::{header::CONTENT_TYPE, Method};
+use axum::{
+    http::{header::CONTENT_TYPE, Method, StatusCode},
+    middleware,
+    response::IntoResponse,
+    Extension, Router,
+};
 
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -16,10 +23,12 @@ use tokio::net::TcpListener;
 use routes::create_router;
 use tower_http::cors::{Any, CorsLayer};
 
-use sqlx::postgres::{PgPool, PgPoolOptions};
+use sea_orm::Database;
+
+// use sqlx::postgres::{PgPool, PgPoolOptions};
 
 pub struct AppState {
-    db: PgPool,
+    // db: PgPool,
 }
 
 // TODO: Setup caching
@@ -35,15 +44,11 @@ async fn main() {
 
     println!("🌟 API Service 🌟");
 
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must set");
-    let pool = match PgPoolOptions::new()
-        .max_connections(10)
-        .connect(&database_url)
-        .await
-    {
-        Ok(pool) => {
+    let conn_str = (*utils::constants::DATABASE_URL).clone();
+    let db = match Database::connect(conn_str).await {
+        Ok(db) => {
             println!("✅ Connection to the database is successful!");
-            pool
+            db
         }
         Err(err) => {
             println!("❌ Failed to connect to the database: {:?}", err);
@@ -56,9 +61,11 @@ async fn main() {
         .allow_origin(Any)
         .allow_headers([CONTENT_TYPE]);
 
-    let app = create_router(Arc::new(AppState { db: pool.clone() }))
+    let app: Router = Router::new()
+        .merge(create_router())
         .layer(cors)
-        .layer(TraceLayer::new_for_http());
+        .layer(TraceLayer::new_for_http())
+        .layer(Extension(db));
 
     println!("✅ Server started successfully at 0.0.0.0:5000");
 
