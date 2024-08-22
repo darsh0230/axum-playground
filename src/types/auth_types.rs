@@ -2,6 +2,12 @@ use axum::{http::StatusCode, response::IntoResponse, Json};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
+#[derive(Serialize, Deserialize)]
+pub struct UserRegisterReq {
+    pub name: String,
+    pub email: String,
+    pub password: String,
+}
 #[derive(Debug)]
 pub struct UserRegisterRes {
     pub name: String,
@@ -19,8 +25,17 @@ impl IntoResponse for UserRegisterRes {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct UserRegisterReq {
-    pub name: String,
+pub struct UserLoginReq {
     pub email: String,
     pub password: String,
+}
+#[derive(Debug)]
+pub struct UserLoginRes {
+    pub token: String,
+}
+
+impl IntoResponse for UserLoginRes {
+    fn into_response(self) -> axum::response::Response {
+        (StatusCode::OK, Json(json!({ "token": self.token }))).into_response()
+    }
 }

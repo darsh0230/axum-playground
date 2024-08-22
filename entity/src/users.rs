@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "users")]
+#[sea_orm(schema_name = "public", table_name = "users")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
@@ -12,7 +12,7 @@ pub struct Model {
     pub email: Option<String>,
     pub password: Option<String>,
     #[sea_orm(unique)]
-    pub uuid: Uuid,
+    pub user_id: Uuid,
     pub created_at: DateTime,
 }
 
