@@ -4,12 +4,11 @@
 cargo watch -c -w src -x run
 ```
 
-## sqlx
+## seaorm
 
 ```
-sqlx migrate add -r create_notes_table
-sqlx migrate run
-sqlx migrate revert
+sea-orm-cli migrate fresh
+sea-orm-cli generate entity -o entity/src
 ```
 
 ## Error Response

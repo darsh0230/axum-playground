@@ -1,16 +1,10 @@
 mod handlers;
-mod models;
 mod routes;
-mod schema;
 mod types;
 mod utils;
 
-use thiserror::Error;
-
 use axum::{
-    http::{header::CONTENT_TYPE, Method, StatusCode},
-    middleware,
-    response::IntoResponse,
+    http::{header::CONTENT_TYPE, Method},
     Extension, Router,
 };
 
@@ -24,12 +18,6 @@ use routes::create_router;
 use tower_http::cors::{Any, CorsLayer};
 
 use sea_orm::Database;
-
-// use sqlx::postgres::{PgPool, PgPoolOptions};
-
-pub struct AppState {
-    // db: PgPool,
-}
 
 // TODO: Setup caching
 
